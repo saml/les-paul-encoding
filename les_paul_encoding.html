@@ -35,6 +35,44 @@
                     B2: 5
                 };
 
+                var Note = function(noteName) {
+                    var me = {};
+                    me.noteName = noteName;
+                    me.noteValue = function() {
+                        return NOTES[me.noteName];
+                    };
+                    return me;
+                };
+                
+                var Chunk = function(noteArray, delayFromPrevious) {
+                    var me = {};
+                    me.noteArray = noteArray;
+                    me.delayFromPrevious = delayFromPrevious;
+
+                    me.isPolyphonic = function() {
+                        return me.noteArray.length > 0;
+                    };
+
+                    me.isLongDelay = function() {
+                        //32 and longer does not fit in 5 bits.
+                        return me.delayFromPrevious >= 32;
+                    };
+
+
+                    return me;
+                };
+
+                var G = Note("G");
+                var A = Note("A");
+                var B = Note("B");
+                var C = Note("C");
+                var D = Note("D");
+                var E = Note("E");
+                var FSharp = Note("FSharp");
+                var G2 = Note("G2");
+                var A2 = Note("A2");
+                var B2 = Note("B2");
+
                 var initNoteIndex =  function() {
                     jQuery("tr.note").each(function() {
                         var i = 0;
