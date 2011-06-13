@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Les Paul Encoding</title>
+        <style>
+            .note {
+                width: 10px;
+            }
+            .off {
+                background: transparent;
+            }
+            .on {
+                background: black;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+        <script>
+            var LesPaul = (function() {
+                var me = {};
+                return me;
+            })();
+
+            jQuery(document).ready(function() {
+                var NOTES = {
+                    G: 2,
+                    A: 6,
+                    B: 3,
+                    C: 0,
+                    D: 7,
+                    E: 1,
+                    FSharp: 8,
+                    G2: 4,
+                    A2: 9,
+                    B2: 5
+                };
+
+                var initNoteIndex =  function() {
+                    jQuery("tr.note").each(function() {
+                        var i = 0;
+                        jQuery(this).children("td.note").each(function() {
+                            $(this).addClass("index-" + i++);
+                        });
+                    });
+                };
+
+                var initClickNote = function() {
+                    jQuery("td.note").toggle(function() {
+                        this.style.backgroundColor = "black";
+                        jQuery(this).removeClass("off").addClass("on");
+                    }, function() {
+                        this.style.backgroundColor = "transparent";
+                        jQuery(this).removeClass("on").addClass("off");
+                    });
+                };
+                
+                var initClickDoIt = function() {
+                    jQuery("#doit").click(function() {
+                        var sequence = [];
+                        for (var i = 0; ; i++) {
+                            var l = [];
+                            var jq = jQuery(".index-" + i);
+                            if (jq.size() < 1) {
+                                break;
+                            }
+                            jq.each(function() {
+                                var jq = jQuery(this);
+                                if (jq.hasClass("on")) {
+                                    var note = jq.parent("tr.note").data("note");
+                                    if (note !== undefined) {
+                                        l.push(note);
+                                    }
+                                }
+                            });
+                            sequence.push(l);
+                        }
+                        console.debug(sequence);
+                    });
+                };
+
+                initNoteIndex();
+                initClickNote();
+                initClickDoIt();
+            });
+        </script>
+    </head>
+    <body>
+        <table id="grid" border="1">
+            <tr class="note" date-note="B2">
+                <td class="piano">mi</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="A2">
+                <td class="piano">re</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="G2">
+                <td class="piano">do</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="FSharp">
+                <td class="piano">ti</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="E">
+                <td class="piano">la</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="D">
+                <td class="piano">sol</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="C">
+                <td class="piano">fa</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="B">
+                <td class="piano">mi</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="A">
+                <td class="piano">re</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+            <tr class="note" data-note="G">
+                <td class="piano">do</td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+                <td class="note off"></td>
+            </tr>
+        </table>
+
+        <button id="doit">Do It</button>
+
+        <div id="output"></div>
+    </body>
+</html>
