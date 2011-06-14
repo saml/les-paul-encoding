@@ -24,34 +24,39 @@ If 1, `<note value>` is 10 bits.
 For monophonic, base 10 values are (the lowest to the highest):
 
 <table>
-    <tr><th>note</th>   <th>base 10</th>    <th>index</th></tr>
-    <tr><td>G, do</td>  <td>2</td>  <td>0</td></tr>
-    <tr><td>A, re</td>  <td>6</td>  <td>1</td></tr>
-    <tr><td>B, mi</td>  <td>3</td>  <td>2</td></tr>
-    <tr><td>C, fa</td>  <td>0</td>  <td>3</td></tr>
-    <tr><td>D, sol</td> <td>7</td>  <td>4</td></tr>
-    <tr><td>E, la</td>  <td>1</td>  <td>5</td></tr>
-    <tr><td>F#, ti</td> <td>8</td>  <td>6</td></tr>
-    <tr><td>G2, do</td> <td>4</td>  <td>7</td></tr>
-    <tr><td>A2, re</td> <td>9</td>  <td>8</td></tr>
-    <tr><td>B2, mi</td> <td>5</td>  <td>9</td></tr>
+    <tr><th>note</th>   <th>base 10</th>    </tr>
+    <tr><td>G, do</td>  <td>2</td>          </tr>
+    <tr><td>A, re</td>  <td>6</td>          </tr>
+    <tr><td>B, mi</td>  <td>3</td>          </tr>
+    <tr><td>C, fa</td>  <td>0</td>          </tr>
+    <tr><td>D, sol</td> <td>7</td>          </tr>
+    <tr><td>E, la</td>  <td>1</td>          </tr>
+    <tr><td>F#, ti</td> <td>8</td>          </tr>
+    <tr><td>G2, do</td> <td>4</td>          </tr>
+    <tr><td>A2, re</td> <td>9</td>          </tr>
+    <tr><td>B2, mi</td> <td>5</td>          </tr>
 </table>
 
 
-Actual `<note value>` is base 16 reversed. For example, for D, it is not 0111, but 1110.
+Actual `<note value>` is base 2 reversed. For example, for D, it is not 0111, but 1110.
 
-For polyphonic, `<note value>` is 10 bit. Zero based index is set. 
-For example, for C,E,G2, it is 0001010100.
+For polyphonic, `<note value>` is 10 bit. base 10 value in the table is used as the index of the 10 bit array. 
+For example, for C,E,G2, it is 1101000000.
+
+    1101000000
+    || +-------- G2, 4
+    |+---------- E,  1
+    +----------- C,  0
 
 # `<is 5 bit>`
 
-If `<is 5 bit>` is 0, `<delay from previous>` is 5 bit, base 16, reversed.
+If `<is 5 bit>` is 0, `<delay from previous>` is 5 bit, base 2, reversed.
 
-If `<is 5 bit>` is 1, `<delay from previous>` is 20 bit, base 16, revversed.
+If `<is 5 bit>` is 1, `<delay from previous>` is 20 bit, base 2, revversed.
 
 # `<delay from previous>`
 
-Probably 1/100 milliseconds. It's always base 16 and reversed.
+Probably 1/100 milliseconds. It's always base 2 and reversed.
 
 
 

@@ -23,25 +23,40 @@
 
             jQuery(document).ready(function() {
                 var NOTES = {
-                    G: 2,
-                    A: 6,
-                    B: 3,
-                    C: 0,
-                    D: 7,
-                    E: 1,
-                    FSharp: 8,
-                    G2: 4,
-                    A2: 9,
-                    B2: 5
+                    G:      [2, 2],
+                    A:      [6, 6],
+                    B:      [3, 3],
+                    C:      [0, 0],
+                    D:      [7, 7],
+                    E:      [1, 1],
+                    FSharp: [8, 8],
+                    G2:     [4, 4],
+                    A2:     [9, 9],
+                    B2:     [5, 5]
                 };
 
                 var Note = function(noteName) {
                     var me = {};
                     me.noteName = noteName;
                     me.noteValue = function() {
-                        return NOTES[me.noteName];
+                        return NOTES[me.noteName][0];
+                    };
+                    me.noteIndex = function() {
+                        return NOTES[me.noteName][1];
                     };
                     return me;
+                };
+
+                var toReversedBits = function(intVal, width) {
+                    if (width === undefined) {
+                        throw "need width for " + intVal;
+                    }
+                    var l = [];
+                    for (var i = 0; i < width; i++) {
+                        l.push(!!(intVal & 1));//the least significant bit is pushed first.
+                        intVal = intVal >> 1;//shift right 1.
+                    }
+                    return l;
                 };
                 
                 var Chunk = function(noteArray, delayFromPrevious) {
@@ -49,8 +64,12 @@
                     me.noteArray = noteArray;
                     me.delayFromPrevious = delayFromPrevious;
 
+                    me.isEmpty = function() {
+                        return me.noteArray.length < 1;
+                    };
+
                     me.isPolyphonic = function() {
-                        return me.noteArray.length > 0;
+                        return me.noteArray.length > 1;
                     };
 
                     me.isLongDelay = function() {
@@ -58,6 +77,48 @@
                         return me.delayFromPrevious >= 32;
                     };
 
+                    me.noteValueAsBits = function() {
+                        var l = [];
+                        var isPolyphonic = me.isPolyphonic();
+
+                        l.push(isPolyphonic);
+
+                        if (isPolyphonic) {
+                            var n = me.noteArray.length;
+
+                            //10 notes mapped. all off.
+                            var noteMap = [false,false,false,false,false,false,false,false,false,false];
+
+                            for (var i = 0; i < n; i++) {
+                                var note = me.noteArray[i];
+                                noteMap[note.noteIndex()] = true;
+                            }
+
+                            l = l.concat(noteMap);
+                        } else {
+                            var note = me.noteArray[0];
+                            l = l.concat(toReversedBits(note.noteValue(), 4));
+                        }
+                        return l;
+                    };
+
+                    me.noteDelayFromPreviousAsBits = function() {
+                        var l = [];
+                        var is20Bits = me.isLongDelay();
+                        l.push(is20Bits);
+                        if (is20Bits) {
+                            l = l.concat(toReversedBits(me.delayFromPrevious, 20));
+                        } else {
+                            l = l.concat(toReversedBits(me.delayFromPrevious, 5));
+                        }
+                        return l;
+                    };
+
+                    me.toBits = function() {
+                        var l = me.noteValueAsBits();
+                        l = l.concat(me.noteDelayFromPreviousAsBits());
+                        return l;
+                    };
 
                     return me;
                 };
@@ -72,6 +133,63 @@
                 var G2 = Note("G2");
                 var A2 = Note("A2");
                 var B2 = Note("B2");
+
+                var Base64 = (function() {
+                    var me = {};
+                    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_*";
+                    var parse64 = function(bits) {
+                        if (bits.length !== 6) {
+                            throw "can only parse 6 bits";
+                        }
+                        var exp = 0;
+                        var n = 0;
+                        for (var i = 5; i >= 0; i--) {
+                            var x = bits[i] ? 1 : 0;
+                            n += x * Math.pow(2, exp);
+                            exp++;
+                        }
+                        return n;
+                    };
+                    me.encode = function(bits) {
+                        //zero pad for base 64
+                        while ((bits.length % 8) !== 0) {
+                            bits.push(false);
+                        }
+                        if (bits.length % 24 === 8) {
+                            //last 8bit is valid. so, pad 4 zeros to make a room for 12 bits (two padding chars).
+                            //8+4+12 = 24
+                            bits.push(false);
+                            bits.push(false);
+                            bits.push(false);
+                            bits.push(false);
+                        } else if (bits.length % 24 === 16) {
+                            //last 16bit is valid. so, pad 2 zeros to make a room for 6 bits (one padding char).
+                            //16+2+6 = 24
+                            bits.push(false);
+                            bits.push(false);
+                        }
+
+                        var n = bits.length;
+                        var l = [];
+                        for (var i = 0; i <= n - 6; i += 6) {
+                            var index = parse64(bits.slice(i, i + 6));
+                            l.push(alphabet.charAt(index));
+                        }
+
+
+
+                        //padding
+                        if (bits.length % 24 === 8 + 4) {
+                            l.push(alphabet.charAt(64));
+                            l.push(alphabet.charAt(64));
+                        } else if (bits.length % 24 === 16 + 2) {
+                            
+                            l.push(alphabet.charAt(64));
+                        }
+                        return l.join("");
+                    };
+                    return me;
+                })();
 
                 var initNoteIndex =  function() {
                     jQuery("tr.note").each(function() {
@@ -94,7 +212,8 @@
                 
                 var initClickDoIt = function() {
                     jQuery("#doit").click(function() {
-                        var sequence = [];
+                        var interval = parseInt(jQuery("#interval").val(), 10);
+                        var chunks = [];
                         for (var i = 0; ; i++) {
                             var l = [];
                             var jq = jQuery(".index-" + i);
@@ -104,15 +223,26 @@
                             jq.each(function() {
                                 var jq = jQuery(this);
                                 if (jq.hasClass("on")) {
-                                    var note = jq.parent("tr.note").data("note");
-                                    if (note !== undefined) {
-                                        l.push(note);
+                                    var noteName = jq.parent("tr.note").data("note");
+                                    if (noteName !== undefined) {
+                                        l.push(Note(noteName));
                                     }
                                 }
                             });
-                            sequence.push(l);
+                            chunks.push(Chunk(l, interval * i));
                         }
-                        console.debug(sequence);
+
+                        var bits = [];
+                        for (var i = 0; i < chunks.length; i++) {
+                            var chunk = chunks[i];
+                            if (!chunk.isEmpty()) {
+                                bits = bits.concat(chunk.toBits());
+                            }
+                        }
+
+                        var url = "http://www.google.com/logos/2011/lespaul.html#tune=" + Base64.encode(bits);
+                        jQuery("#output").empty().append('<a href="' + url + '" target="_blank">' + url + '</a>');
+                        return false;
                     });
                 };
 
@@ -124,7 +254,7 @@
     </head>
     <body>
         <table id="grid" border="1">
-            <tr class="note" date-note="B2">
+            <tr class="note" data-note="B2">
                 <td class="piano">mi</td>
                 <td class="note off"></td>
                 <td class="note off"></td>
@@ -256,8 +386,10 @@
             </tr>
         </table>
 
-        <button id="doit">Do It</button>
-
+        <form action="#">
+            Interval: <input type="text" id="interval" value="1" name="interval"/><br/>
+            <button id="doit">Do It</button>
+        </form>
         <div id="output"></div>
     </body>
 </html>
