@@ -4,6 +4,10 @@ This is for: http://www.google.com/logos/2011/lespaul.html
 
 You can set `#tune=` parameter. The parameter is base64 encoding of chunks.
 
+# Example Demo
+
+http://saml.github.com/les_paul_encoding.html
+
 # Chunk
 
 Each chunk has the following format:
@@ -40,7 +44,7 @@ For monophonic, base 10 values are (the lowest to the highest):
 
 Actual `<note value>` is base 2 reversed. For example, for D, it is not 0111, but 1110.
 
-For polyphonic, `<note value>` is 10 bit. base 10 value in the table is used as the index of the 10 bit array. 
+For polyphonic, `<note value>` is 10 bit. base 10 value in the table is used as the index of the 10 bit array.
 For example, for C,E,G2, it is 1101000000.
 
     1101000000
