@@ -7,6 +7,7 @@ You can set `#tune=` parameter. The parameter is base64 encoding of chunks.
 # Example Demo
 
 http://saml.github.com/les_paul_encoding.html
+http://www.google.com/logos/2011/lespaul.html#tune=iILERTgCkRCowFQKKiILERShCkRCsAlQkKIVEQqBikhFGFCKYoFQyngFAqKUSoBRimgFMEKRQUMpiBRikBVAKTkU
 
 # Chunk
 
